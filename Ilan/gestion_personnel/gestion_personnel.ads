@@ -1,4 +1,5 @@
-with gestion_identite; use gestion_identite;
+with ada.unchecked_deallocation, gestion_identite;
+use gestion_identite;
 
 package gestion_personnel is
 
@@ -19,6 +20,9 @@ package gestion_personnel is
       suiv    : P_employe;
    end record;
 
+   procedure liberer_memoire_employe is new
+     ada.unchecked_deallocation (T_cell_employe, P_employe);
+
    --Affichage d'un record T_employe
    procedure affichage_employe (employe : in T_employe);
 
@@ -35,6 +39,14 @@ package gestion_personnel is
    procedure ajout_employe (tete : in out P_employe);
 
    --Enregistrement de la demande de départ d'un employe
+   procedure dem_depart_employe (tete : in out P_employe);
+
+   --Supprime tous les employes qui ont une demande de depart enregistree
    procedure depart_employe (tete : in out P_employe);
+
+   --Recherche d'un employe donné
+   function recherche_employe
+     (tete : in P_employe; id : in T_identite; tech : boolean)
+      return P_employe;
 
 end gestion_personnel;

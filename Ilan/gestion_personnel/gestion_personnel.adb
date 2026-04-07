@@ -56,28 +56,14 @@ package body gestion_personnel is
 
    --Visualisation d'un employé donné (nom et catégorie)
    procedure visu_employe (tete : in P_employe) is
-      nom    : T_Nom;
-      choix  : Character;
-      tech   : Boolean;
-      erreur : Boolean;
-
-      --Procedure auxilliaire de visualisation
-      procedure visualisation
-        (tete : in P_employe; nom : in T_Nom; tech : in boolean) is
-      begin
-         if tete /= null then
-            if tete.employe.id_employe.id_nom = nom
-              and then tete.employe.technicien = tech
-            then
-               affichage_employe (tete.employe);
-            end if;
-         end if;
-      end visualisation;
+      id      : T_identite;
+      choix   : Character;
+      tech    : Boolean;
+      employe : P_employe;
 
    begin
       --Saisie des données de l'employe a visualiser
-      put ("Nom : ");
-      saisie_nom (nom);
+      saisie_identite (id);
       loop
          put ("Categorie (T/I): ");
          get (choix);
@@ -92,7 +78,7 @@ package body gestion_personnel is
       end if;
 
       --Visualisation
-      visualisation (tete, nom, tech);
+      affichage_employe (recherche_employe (tete, id, tech).employe);
    end visu_employe;
 
    --Saisie d'un record T_employe
@@ -137,32 +123,15 @@ package body gestion_personnel is
    end ajout_employe;
 
    --Enregistrement de la demande de départ d'un employe
-   procedure depart_employe (tete : in out P_employe) is
-      nom          : T_Nom;
-      erreur, tech : boolean;
-      choix        : Character;
-
-      --Procedure auxiliaire de recherche
-      procedure recherche
-        (tete : in out P_employe; nom : in T_Nom; tech : in boolean) is
-      begin
-         if tete /= null then
-            if tete.employe.id_employe.id_nom = nom
-              and then tete.employe.technicien = tech
-            then
-               tete.employe.depart := true;
-            else
-               recherche (tete.suiv, nom, tech);
-            end if;
-         end if;
-      end recherche;
+   procedure dem_depart_employe (tete : in out P_employe) is
+      id      : T_identite;
+      tech    : boolean;
+      choix   : Character;
+      employe : P_employe;
 
    begin
-      --Saisie du nom
-      put ("Nom : ");
-      saisie_nom (nom);
-
-      --Saisie de la catégorie
+      --Saisie des données de l'employé à visualiser
+      saisie_identite (id);
       loop
          put ("Catégorie de l'employe (T/I) :");
          get (choix);
@@ -176,8 +145,49 @@ package body gestion_personnel is
          tech := false;
       end if;
 
-      recherche (tete, nom, tech);
+      employe := recherche_employe (tete, id, tech);
+      if employe /= null then
+         employe.employe.depart := true;
+      else
+         put ("Le client n'existe pas");
+      end if;
+   end dem_depart_employe;
 
+   procedure depart_employe (tete : in out P_employe) is
+      p : P_employe;
+   begin
+      if tete /= null then
+         if tete.employe.depart = true then
+            p := tete;
+            tete := tete.suiv;
+            liberer_memoire_employe (p);
+         else
+            depart_employe (tete.suiv);
+         end if;
+      end if;
    end depart_employe;
+
+   --Recherche d'un employe donné
+   function recherche_employe
+     (tete : P_employe; id : T_identite; tech : boolean) return P_employe is
+   begin
+      if tete = null then
+         return (null);
+      else
+         if tete.employe.id_employe.id_nom.nom
+              (1 .. tete.employe.id_employe.id_nom.knom)
+           = id.id_nom.nom (1 .. id.id_nom.knom)
+           and then
+             tete.employe.id_employe.id_prenom.nom
+               (1 .. tete.employe.id_employe.id_prenom.knom)
+             = id.id_prenom.nom (1 .. id.id_prenom.knom)
+           and then tete.employe.technicien = tech
+         then
+            return (tete);
+         else
+            return (recherche_employe (tete.suiv, id, tech));
+         end if;
+      end if;
+   end recherche_employe;
 
 end gestion_personnel;
