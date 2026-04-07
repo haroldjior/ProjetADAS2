@@ -2,12 +2,6 @@ package gestion_identite is
 
    subtype T_mot is string (1 .. 20);
 
-   --Prenom et sa taille
-   type T_prenom is record
-      prenom  : T_mot;
-      kprenom : integer range 1 .. 20;
-   end record;
-
    --Nom et sa taille
    type T_Nom is record
       nom  : T_mot;
@@ -16,13 +10,11 @@ package gestion_identite is
 
    --Identite avec Nom et Prenom
    type T_identite is record
-      id_nom    : T_nom;
-      id_prenom : T_prenom;
+      id_nom, id_prenom : T_nom;
    end record;
 
    --Saisie du nom ou prenom d'une personne selon les contraintes du sujet
-   procedure saisie_nom
-     (mot : out T_mot; k : out integer; erreur : out boolean);
+   procedure saisie_nom (nom : out T_Nom);
 
    --Saisie de l'identité complète d'une personne
    procedure saisie_identite (id : out T_identite);
