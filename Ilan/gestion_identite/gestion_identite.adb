@@ -1,11 +1,12 @@
 with ada.text_io, ada.characters.handling;
 use ada.text_io, ada.characters.handling;
+with gestion_client;
 
 package body gestion_identite is
 
    --Saisie du nom et prenom d'une personne, selon les contraintes du sujet
-   procedure saisie_nom (nom : out T_Nom) is
-      mot    : T_mot;
+   procedure saisie_identite (id : out T_identite) is
+      mot    : T_mot := (others => ' ');
       k      : Integer;
       erreur : Boolean;
 
@@ -51,25 +52,34 @@ package body gestion_identite is
 
    begin
       loop
-         get_line (mot, k);
-         nom.nom := to_upper (mot);
-         nom.knom := k;
-         verif_nom (nom, erreur);
-         exit when erreur = false;
-         put_line ("/!\ Saisie invalide");
+         begin
+            put ("Nom : ");
+            get_line (mot, k);
+            id.id_nom.nom := to_upper (mot);
+            id.id_nom.knom := k;
+            verif_nom (id.id_nom, erreur);
+            exit when erreur = false;
+            put_line ("/!\ Saisie invalide");
+         exception
+            when Constraint_Error =>
+               put_line ("/!\ Saisie invalide");
+         end;
       end loop;
-   end saisie_nom;
+      loop
+         begin
+            put ("Prenom : ");
+            get_line (mot, k);
+            id.id_prenom.nom := to_upper (mot);
+            id.id_prenom.knom := k;
+            verif_nom (id.id_prenom, erreur);
+            exit when erreur = false;
+            put_line ("/!\ Saisie invalide");
+         exception
+            when Constraint_Error =>
+               put_line ("/!\ Saisie invalide");
+         end;
+      end loop;
 
-   --Saisie de l'identité complète d'une personne
-   procedure saisie_identite (id : out T_identite) is
-      erreur : boolean;
-   begin
-      --Saisie du nom
-      put ("Nom : ");
-      saisie_nom (id.id_nom);
-      --Saisie du prénom
-      put ("Prenom : ");
-      saisie_nom (id.id_prenom);
    end saisie_identite;
 
    --Affichage de l'identite d'une personne

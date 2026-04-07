@@ -13,10 +13,7 @@ package gestion_identite is
       id_nom, id_prenom : T_nom;
    end record;
 
-   --Saisie du nom ou prenom d'une personne selon les contraintes du sujet
-   procedure saisie_nom (nom : out T_Nom);
-
-   --Saisie de l'identité complète d'une personne
+   --Saisie de l'identite complète d'une personne,
    procedure saisie_identite (id : out T_identite);
 
    --Affichage de l'identite d'une personne
