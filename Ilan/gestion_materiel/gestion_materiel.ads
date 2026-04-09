@@ -23,14 +23,28 @@ package gestion_materiel is
       suiv     : P_materiel;
    end record;
 
+   -- ### AFFICHAGES / VISUALISATIONS ###
+
    --Affichage d'un seul pack de materiel
    procedure affichage_materiel (Mat : in T_materiel);
 
    --Affichage de l'ensemble des packs de materiel
-   procedure affichage_packs (tete : in P_materiel);
+   procedure visu_packs_mat (tete : in P_materiel);
+
+   --Visualisation de tous les packs disponibles
+   procedure visu_pack_dispo (tete : in P_materiel);
+
+
+   -- ### SAISIES / INSERTIONS ###
+
+   --Saisie d'un record T_materiel
+   procedure saisie_pack_mat (mat : out T_materiel; date : in T_date);
 
    --Ajout d'un nouveau pack de materiel avec saisie de la categorie
    procedure nouv_pack_mat (tete : in out P_materiel; date : in T_date);
+
+
+   -- ### SUPPRESSIONS ###
 
    --Saisie d'un id  et d'une categorie puis suppression du pack associé
    procedure supp_pack_idcat (tete : in out P_materiel);
@@ -40,7 +54,5 @@ package gestion_materiel is
    procedure supp_pack_date
      (tete : in out P_materiel; tab_mois : in T_tab_mois);
 
-   --Visualisation de tous les packs disponibles
-   procedure visu_pack_dispo (tete : in P_materiel);
 
 end gestion_materiel;

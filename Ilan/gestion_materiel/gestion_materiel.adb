@@ -7,6 +7,8 @@ use ada.text_io, ada.integer_text_io, ada.characters.handling, gestion_date;
 
 package body gestion_materiel is
 
+   -- ### AFFICHAGES / VISUALISATIONS ###
+
    --Affichage d'un seul pack de materiel
    procedure affichage_materiel (Mat : in T_materiel) is
    begin
@@ -47,21 +49,33 @@ package body gestion_materiel is
    end affichage_materiel;
 
    --Affichage de l'ensemble des packs de materiel, erreur est a initalisé à true dans le main
-   procedure affichage_packs (tete : in P_materiel) is
+   procedure visu_packs_mat (tete : in P_materiel) is
    begin
       if tete /= null then
          affichage_materiel (tete.materiel);
-         affichage_packs (tete.suiv);
+         visu_packs_mat (tete.suiv);
       end if;
-   end affichage_packs;
+   end visu_packs_mat;
 
-   --Ajout d'un nouveau pack de materiel avec saisie de la categorie
-   procedure nouv_pack_mat (tete : in out P_materiel; date : in T_date) is
-      Mat : T_materiel;
-      s   : String (1 .. 11);
-      k   : integer;
+   --Visualisation de tous les packs disponibles
+   procedure visu_pack_dispo (tete : in P_materiel) is
    begin
+      if tete /= null then
+         visu_pack_dispo (tete.suiv);
+         if tete.materiel.dispo then
+            affichage_materiel (tete.materiel);
+         end if;
+      end if;
+   end visu_pack_dispo;
 
+
+   -- ### SAISIES / INSERTIONS ###
+
+   --Saisie d'un record T_materiel
+   procedure saisie_pack_mat (mat : out T_materiel; date : in T_date) is
+      s : String (1 .. 11);
+      k : integer;
+   begin
       --Saisie de la categorie de materiel
       loop
          begin
@@ -78,20 +92,31 @@ package body gestion_materiel is
       end loop;
 
       --Initialisation de toutes les autres de variables
-      if Tete = null then
-         Mat.id_mat := 1;
-      else
-         Mat.id_mat := Tete.materiel.id_mat + 1;
-      end if;
+      mat.id_mat := 1;
       Mat.date_serv := date;
       Mat.util := 0;
       Mat.dispo := true;
       Mat.supp := false;
+   end saisie_pack_mat;
+
+   --Ajout d'un nouveau pack de materiel avec saisie de la categorie
+   procedure nouv_pack_mat (tete : in out P_materiel; date : in T_date) is
+      mat : T_materiel;
+   begin
+      --Saisie du pack
+      saisie_pack_mat (mat, date);
+      if tete = null then
+         mat.id_mat := 1;
+      else
+         mat.id_mat := tete.materiel.id_mat + 1;
+      end if;
 
       --Ajout en tete dans la liste des packs
-      Tete := new T_cell_materiel'(Mat, Tete);
-
+      Tete := new T_cell_materiel'(mat, tete);
    end nouv_pack_mat;
+
+
+   -- ### SUPPRESSIONS ###
 
    --Saisie d'un id et d'une categorie puis suppression du pack associé
    procedure supp_pack_idcat (tete : in out P_materiel) is
@@ -178,15 +203,5 @@ package body gestion_materiel is
       SPD (tete, date);
    end supp_pack_date;
 
-   --Visualisation de tous les packs disponibles
-   procedure visu_pack_dispo (tete : in P_materiel) is
-   begin
-      if tete /= null then
-         visu_pack_dispo (tete.suiv);
-         if tete.materiel.dispo then
-            affichage_materiel (tete.materiel);
-         end if;
-      end if;
-   end visu_pack_dispo;
 
 end gestion_materiel;
