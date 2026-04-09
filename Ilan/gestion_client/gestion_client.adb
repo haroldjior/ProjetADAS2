@@ -10,6 +10,8 @@ use ada.text_io,
 
 package body gestion_client is
 
+   -- ### UTILITAIRE ###
+
    --Recherche d'un client donné dans l'ABR
    function recherche_client
      (tete : P_client; client : T_identite) return P_client is
@@ -27,6 +29,10 @@ package body gestion_client is
       end if;
    end recherche_client;
 
+
+   -- ### AFFICHAGES / VISUALISATIONS ###
+
+   --Affichage d'un record T_client
    procedure affichage_client (client : in T_client) is
    begin
       new_line;
@@ -42,6 +48,20 @@ package body gestion_client is
       new_line;
    end affichage_client;
 
+   --Visualisation de l'ensemble de la clientèle (ordre préfixe)
+   procedure visu_clients (tete : in P_client) is
+   begin
+      if tete /= null then
+         affichage_client (tete.client);
+         visu_clients (tete.fg);
+         visu_clients (tete.fd);
+      end if;
+   end visu_clients;
+
+
+   -- ### SAISIES / INSERTIONS ###
+
+   --Saisie d'un record T_client
    procedure saisie_client (client : out T_client) is
       id : T_identite;
    begin
@@ -53,37 +73,42 @@ package body gestion_client is
    end saisie_client;
 
    --Ajout d'un client dans l'ABR, compare d'abord le nom puis le prénom
-   procedure nouv_client (tete : in out P_client; client : in T_client) is
+   procedure nouv_client (tete : in out P_client) is
+      client : T_client;
+   begin
+      saisie_client (client);
+      insertion_client (tete, client);
+   end nouv_client;
+
+   --Insertion d'un client donné dans l'ABR, compare d'abord le nom puis le prénom
+   procedure insertion_client (tete : in out P_client; client : in T_client) is
    begin
       if tete = null then
          tete := new T_cell_client'(client, null, null);
       else
          if client.id_client.id_nom.nom < tete.client.id_client.id_nom.nom then
-            nouv_client (tete.fg, client);
+            insertion_client (tete.fg, client);
          elsif client.id_client.id_nom.nom = tete.client.id_client.id_nom.nom
          then
             if client.id_client.id_prenom.nom
               <= tete.client.id_client.id_prenom.nom
             then
-               nouv_client (tete.fg, client);
+               insertion_client (tete.fg, client);
+               insertion_client (tete.fg, client);
             else
-               nouv_client (tete.fd, client);
+               insertion_client (tete.fd, client);
             end if;
          else
-            nouv_client (tete.fd, client);
+            insertion_client (tete.fd, client);
          end if;
       end if;
-   end nouv_client;
+   end insertion_client;
 
-   procedure visu_clients (tete : in P_client) is
-   begin
-      if tete /= null then
-         affichage_client (tete.client);
-         visu_clients (tete.fg);
-         visu_clients (tete.fd);
-      end if;
-   end visu_clients;
 
+   -- ### FONCTIONNALITÉS ###
+
+   --Enregistrement d'un reglement (par l'identite du client)
+   --possible que si montant <= facture
    procedure enr_reglement (tete : in out P_client) is
       id_client : T_identite;
       client    : P_client;
