@@ -3,6 +3,8 @@ use ada.text_io, ada.integer_text_io;
 
 package body gestion_date is
 
+   -- ### UTILITAIRE ###
+
    --Fonction qui initialise le tableau de mois, le mois de février sera initalisé pendant la saisie de la date (en fonction de l'année)
    function init_tab_mois return T_tab_mois is
       tab_mois : T_tab_mois;
@@ -44,6 +46,32 @@ package body gestion_date is
          return (false);
       end if;
    end bissextile;
+
+
+   -- ### AFFICHAGES ###
+
+   --Affichage d'une date au format JJ/MM/AAAA
+   procedure affichage_date (date : in T_date) is
+   begin
+      if date.jour < 10 then
+         put ("0");
+         put (date.jour, 1);
+      else
+         put (date.jour, 2);
+      end if;
+      put ("/");
+      if T_liste_mois'pos (date.mois) + 1 < 10 then
+         put ("0");
+         put (T_liste_mois'pos (date.mois) + 1, 1);
+      else
+         put (T_liste_mois'pos (date.mois) + 1, 2);
+      end if;
+      put ("/");
+      put (date.annee, 4);
+   end affichage_date;
+
+
+   -- ### SAISIES ###
 
    --Saisie d'une date, avec vérification de la bissextilité de l'année et initialisation du nombre de jour du mois de février dans le tableau de mois
    procedure saisie_date (date : in out T_date; tab_mois : in out T_tab_mois)
@@ -137,43 +165,8 @@ package body gestion_date is
       end loop;
    end saisie_date;
 
-   --Affichage d'une date au format JJ/MM/AAAA
-   procedure affichage_date (date : in T_date) is
-   begin
-      if date.jour < 10 then
-         put ("0");
-         put (date.jour, 1);
-      else
-         put (date.jour, 2);
-      end if;
-      put ("/");
-      if T_liste_mois'pos (date.mois) + 1 < 10 then
-         put ("0");
-         put (T_liste_mois'pos (date.mois) + 1, 1);
-      else
-         put (T_liste_mois'pos (date.mois) + 1, 2);
-      end if;
-      put ("/");
-      put (date.annee, 4);
-   end affichage_date;
 
-   --Passage au lendemain
-   procedure lendemain (date : in out T_date; tab_mois : in T_tab_mois) is
-   begin
-      if date.jour = tab_mois (T_liste_mois'pos (date.mois) + 1).nb_jour then
-         date.jour := 1;
-         if date.mois
-           = tab_mois (T_liste_mois'pos (T_liste_mois'last) + 1).mois
-         then
-            date.mois := T_liste_mois'first;
-            date.annee := date.annee + 1;
-         else
-            date.mois := T_liste_mois'val (T_liste_mois'pos (date.mois) + 1);
-         end if;
-      else
-         date.jour := date.jour + 1;
-      end if;
-   end lendemain;
+   -- ### FONCTIONNALITÉS ###
 
    --Différence entre 2 dates en utilisant la procedure de passage au lendemain
    function diff_date
@@ -213,5 +206,23 @@ package body gestion_date is
          return (false);
       end if;
    end date_anterieure;
+
+   --Passage au lendemain
+   procedure lendemain (date : in out T_date; tab_mois : in T_tab_mois) is
+   begin
+      if date.jour = tab_mois (T_liste_mois'pos (date.mois) + 1).nb_jour then
+         date.jour := 1;
+         if date.mois
+           = tab_mois (T_liste_mois'pos (T_liste_mois'last) + 1).mois
+         then
+            date.mois := T_liste_mois'first;
+            date.annee := date.annee + 1;
+         else
+            date.mois := T_liste_mois'val (T_liste_mois'pos (date.mois) + 1);
+         end if;
+      else
+         date.jour := date.jour + 1;
+      end if;
+   end lendemain;
 
 end gestion_date;

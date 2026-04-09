@@ -31,20 +31,28 @@ package gestion_date is
       annee : positive range 2000 .. 2300;
    end record;
 
-   --Fonction qui initialise le tableau de mois, le mois de février sera initalisé pendant la saisie de la date (en fonction de l'année)
+   -- ### UTILITAIRE ###
+
+   --Initialisation du tableau de mois, le mois de février sera initalisé pendant la saisie de la date (en fonction de l'année)
    function init_tab_mois return T_tab_mois;
 
    --Fonction qui prend une annee et qui retourne un booleen true si elle est bissextile et false elle ne l'est pas
    function bissextile (annee : integer) return boolean;
 
-   --Saisie d'une date, avec vérification de la bissextilité de l'année et initialisation du nombre de jour du mois de février dans le tableau de mois
-   procedure saisie_date (date : in out T_date; tab_mois : in out T_tab_mois);
+
+   -- ### AFFICHAGES ###
 
    --Affichage d'une date au format JJ/MM/AAAA
    procedure affichage_date (date : in T_date);
 
-   --Passage au lendemain
-   procedure lendemain (date : in out T_date; tab_mois : in T_tab_mois);
+
+   -- ### SAISIES ###
+
+   --Saisie d'une date, avec vérification de la bissextilité de l'année et initialisation du nombre de jour du mois de février dans le tableau de mois
+   procedure saisie_date (date : in out T_date; tab_mois : in out T_tab_mois);
+
+
+   -- ### FONCTIONNALITÉS ###
 
    --Différence entre 2 dates en utilisant la procedure de passage au lendemain
    function diff_date
@@ -53,5 +61,8 @@ package gestion_date is
 
    --Verifie si la date 1 est anterieure à la date 2, retourne true si oui et false si non
    function date_anterieure (date1, date2 : in T_date) return boolean;
+
+   --Passage au lendemain
+   procedure lendemain (date : in out T_date; tab_mois : in T_tab_mois);
 
 end gestion_date;
