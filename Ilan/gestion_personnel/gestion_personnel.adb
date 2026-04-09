@@ -10,6 +10,34 @@ use ada.text_io,
 
 package body gestion_personnel is
 
+   -- ### UTILITAIRE ###
+
+   --Recherche d'un employe donné
+   function recherche_employe
+     (tete : P_employe; id : T_identite; tech : boolean) return P_employe is
+   begin
+      if tete = null then
+         return (null);
+      else
+         if tete.employe.id_employe.id_nom.nom
+              (1 .. tete.employe.id_employe.id_nom.knom)
+           = id.id_nom.nom (1 .. id.id_nom.knom)
+           and then
+             tete.employe.id_employe.id_prenom.nom
+               (1 .. tete.employe.id_employe.id_prenom.knom)
+             = id.id_prenom.nom (1 .. id.id_prenom.knom)
+           and then tete.employe.technicien = tech
+         then
+            return (tete);
+         else
+            return (recherche_employe (tete.suiv, id, tech));
+         end if;
+      end if;
+   end recherche_employe;
+
+
+   -- ### AFFICHAGES / VISUALISATIONS ###
+
    --Affichage d'un record T_employe
    procedure affichage_employe (employe : in T_employe) is
    begin
@@ -81,6 +109,9 @@ package body gestion_personnel is
       affichage_employe (recherche_employe (tete, id, tech).employe);
    end visu_employe;
 
+
+   -- ### SAISIES / INSERTIONS ###
+
    --Saisie d'un record T_employe
    procedure saisie_employe (Employe : out T_employe) is
       choix  : Character;
@@ -121,6 +152,9 @@ package body gestion_personnel is
          tete := new T_cell_employe'(employe, tete);
       end if;
    end ajout_employe;
+
+
+   -- ### FONCTIONNALITÉS ###
 
    --Enregistrement de la demande de départ d'un employe
    procedure dem_depart_employe (tete : in out P_employe) is
@@ -167,27 +201,5 @@ package body gestion_personnel is
       end if;
    end depart_employe;
 
-   --Recherche d'un employe donné
-   function recherche_employe
-     (tete : P_employe; id : T_identite; tech : boolean) return P_employe is
-   begin
-      if tete = null then
-         return (null);
-      else
-         if tete.employe.id_employe.id_nom.nom
-              (1 .. tete.employe.id_employe.id_nom.knom)
-           = id.id_nom.nom (1 .. id.id_nom.knom)
-           and then
-             tete.employe.id_employe.id_prenom.nom
-               (1 .. tete.employe.id_employe.id_prenom.knom)
-             = id.id_prenom.nom (1 .. id.id_prenom.knom)
-           and then tete.employe.technicien = tech
-         then
-            return (tete);
-         else
-            return (recherche_employe (tete.suiv, id, tech));
-         end if;
-      end if;
-   end recherche_employe;
 
 end gestion_personnel;
