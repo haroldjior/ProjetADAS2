@@ -38,10 +38,16 @@ package gestion_date is
 
    procedure visu_date (date : in T_date);
 
-   procedure passage_lendemain
-     (date : in out T_date; tab_mois : in out T_tab_mois);
+   function passage_lendemain
+     (date : in out T_date; tab_mois : in out T_tab_mois) return T_date;
+
+   function ordre_dates
+     (D1, D2 : T_date)
+      return boolean; --true si D1 est avant D2 false sinon y compris pour la meme date
 
    function ecart_dates
      (D1, D2 : T_date; tab_mois : T_tab_mois) return integer;
+
+   function dates_egales (D1, D2 : T_date) return Boolean;
 
 end gestion_date;

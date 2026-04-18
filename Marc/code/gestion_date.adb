@@ -14,7 +14,6 @@ package body gestion_date is
       end if;
    end bissextile;
 
-
    function nb_J_mois
      (liste_mois : T_liste_mois; annee : integer) return T_tab_mois
    is
@@ -113,10 +112,11 @@ package body gestion_date is
       put (T_liste_mois'image (date.mois));
       put (" ");
       put (date.annee, 4);
+      new_line;
    end visu_date;
 
-   procedure passage_lendemain
-     (date : in out T_date; tab_mois : in out T_tab_mois) is
+   function passage_lendemain
+     (date : in out T_date; tab_mois : in out T_tab_mois) return T_date is
 
    begin
       tab_mois := nb_J_mois (date.mois, date.annee);
@@ -131,7 +131,30 @@ package body gestion_date is
       else
          date.jour := date.jour + 1;
       end if;
+      return (date);
    end passage_lendemain;
+
+   function ordre_dates (D1, D2 : T_date) return boolean is
+      --true si D1 est avant D2 false sinon
+   begin
+      if D1.annee > D2.annee then
+         return False;
+      elsif D1.annee = D2.annee then
+         if T_liste_mois'pos (D1.mois) > T_liste_mois'pos (D2.mois) then
+            return false;
+         elsif T_liste_mois'pos (D1.mois) = T_liste_mois'pos (D2.mois) then
+            if D1.jour >= D2.jour then
+               return false;
+            else
+               return true;
+            end if;
+         else
+            return true;
+         end if;
+      else
+         return true;
+      end if;
+   end ordre_dates;
 
    function ecart_dates (D1, D2 : T_date; tab_mois : T_tab_mois) return integer
    is
@@ -141,12 +164,27 @@ package body gestion_date is
    begin
       date_tampon := D1;
       tab_mois_tampon := tab_mois;
-      while date_tampon /= D2 loop
-         passage_lendemain (date_tampon, tab_mois_tampon);
-         ecart := ecart + 1;
-      end loop;
-      return (ecart);
+      if ordre_dates (D1, D2) then
+         while ordre_dates (date_tampon, D2) loop
+            date_tampon := passage_lendemain (date_tampon, tab_mois_tampon);
+            ecart := ecart + 1;
+         end loop;
+         return (ecart);
+      else
+         return (-1);
+      end if;
    end ecart_dates;
 
+   function dates_egales (D1, D2 : T_date) return Boolean is
+   begin
+      if D1.annee = D2.annee
+        and then D1.mois = D2.mois
+        and then D1.jour = D2.jour
+      then
+         return true;
+      else
+         return false;
+      end if;
+   end dates_egales;
 
 end gestion_date;
